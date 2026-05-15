@@ -40,33 +40,33 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    
+
     if (!userId || !password) {
       setError(role === 'admin' ? 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน' : 'กรุณากรอกรหัสนักเรียนและรหัสผ่าน')
       return
     }
 
     setIsLoading(true)
-    
+
     try {
       const res = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, password, role })
       })
-      
+
       if (!res.ok) {
         throw new Error('Invalid credentials')
       }
-      
+
       const userData = await res.json()
-      
+
       localStorage.setItem('school_user', JSON.stringify(userData))
       router.push('/dashboard')
     } catch (err) {
       setError(role === 'admin' ? 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' : 'รหัสนักเรียนหรือรหัสผ่านไม่ถูกต้อง')
     }
-    
+
     setIsLoading(false)
   }
 
@@ -237,7 +237,7 @@ export default function LoginPage() {
               {role === 'admin' ? 'ใช้บัญชี Admin Demo' : 'ใช้บัญชีนักเรียน Demo'}
             </Button>
             <p className="text-xs text-muted-foreground text-center mt-2">
-              {role === 'admin' 
+              {role === 'admin'
                 ? 'ID: admin / Password: admin123'
                 : 'ID: 65010001 / Password: student123'
               }

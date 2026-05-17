@@ -120,4 +120,4 @@ export const mockNotifications: Notification[] = [
 
 export const days = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์']
 export const subjects = ['คณิตศาสตร์', 'ภาษาอังกฤษ', 'วิทยาศาสตร์', 'ภาษาไทย', 'สังคมศึกษา', 'คอมพิวเตอร์']
-export const buildings = ['อาคาร 1', 'อาคาร 2', 'อาคาร 3', 'อาคาร 4 (วิทยาศาสตร์)', 'อาคาร 5']
+export const buildings = ['อาคาร 1', 'อาคาร 2', 'อาคาร 3', 'อาคาร 4', 'อาคาร 5']

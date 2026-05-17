@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useMemo } from 'react'
 import { Calendar, Clock, MapPin, User, ChevronLeft, ChevronRight, Info } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -15,10 +16,6 @@ import {
 import { days } from '@/lib/mock-data'
 import type { Schedule } from '@/lib/types'
 import { cn } from '@/lib/utils'
-
-const timeSlots = [
-  '08:30', '09:30', '10:30', '11:30', '13:00', '14:00', '15:00'
-]
 
 export default function SchedulePage() {
   const [view, setView] = useState<'daily' | 'weekly'>('daily')
@@ -43,6 +40,13 @@ export default function SchedulePage() {
         setIsLoading(false)
       })
   }, [])
+
+  const dynamicTimeSlots = useMemo(() => {
+    const defaultSlots = ['08:30', '09:30', '10:30', '11:30', '13:00', '14:00', '15:00']
+    const addedSlots = schedules.map(s => s.startTime).filter(Boolean)
+    const allSlots = Array.from(new Set([...defaultSlots, ...addedSlots]))
+    return allSlots.sort()
+  }, [schedules])
 
   const currentDaySchedules = schedules.filter(s => s.day === days[selectedDay])
 
@@ -172,7 +176,7 @@ export default function SchedulePage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {timeSlots.map((time, index) => (
+                  {dynamicTimeSlots.map((time, index) => (
                     <tr key={time} className={index % 2 === 0 ? 'bg-background' : 'bg-secondary/30'}>
                       <td className="p-3 text-sm text-muted-foreground border-r border-border font-mono">
                         {time}

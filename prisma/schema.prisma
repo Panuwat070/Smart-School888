@@ -60,3 +60,14 @@ model Notification {
   createdAt DateTime @default(now())
   read      Boolean  @default(false)
 }
+
+model Book {
+  id          String   @id @default(uuid())
+  title       String
+  subject     String
+  coverImage  String?
+  pdfUrl      String?
+  author      String
+  description String?
+  createdAt   DateTime @default(now())
+}

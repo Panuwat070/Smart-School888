@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
-import { mockNotifications } from '@/lib/mock-data'
+import type { Announcement } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { MobileMenuButton } from './sidebar'
 
@@ -26,7 +26,10 @@ export function Topbar({ onMobileMenuClick }: TopbarProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [showSearch, setShowSearch] = useState(false)
   const [user, setUser] = useState<{ name: string; classroom: string } | null>(null)
-  const unreadCount = mockNotifications.filter(n => !n.read).length
+  const [announcements, setAnnouncements] = useState<Announcement[]>([])
+  
+  // For demo, we just use the first 2 as unread if any exist
+  const unreadCount = Math.min(announcements.length, 2)
 
   useEffect(() => {
     // Get theme from localStorage or system preference
@@ -45,6 +48,16 @@ export function Topbar({ onMobileMenuClick }: TopbarProps) {
     if (savedUser) {
       setUser(JSON.parse(savedUser))
     }
+
+    // Fetch real announcements
+    fetch('/api/announcements')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setAnnouncements(data)
+        }
+      })
+      .catch(console.error)
   }, [])
 
   const toggleTheme = () => {
@@ -107,35 +120,39 @@ export function Topbar({ onMobileMenuClick }: TopbarProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80">
               <DropdownMenuLabel className="flex items-center justify-between">
-                <span>การแจ้งเตือน</span>
+                <span>ประกาศล่าสุด</span>
                 {unreadCount > 0 && (
                   <Badge variant="secondary" className="text-xs">
-                    {unreadCount} ใหม่
+                    ใหม่
                   </Badge>
                 )}
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {mockNotifications.slice(0, 5).map((notification) => (
+              {announcements.length === 0 && (
+                <div className="p-4 text-center text-sm text-muted-foreground">ไม่มีประกาศใหม่</div>
+              )}
+              {announcements.slice(0, 5).map((announcement, index) => (
                 <DropdownMenuItem
-                  key={notification.id}
+                  key={announcement.id}
                   className={cn(
                     'flex flex-col items-start gap-1 p-3 cursor-pointer',
-                    !notification.read && 'bg-primary/5'
+                    index < unreadCount && 'bg-primary/5'
                   )}
                 >
                   <div className="flex items-center gap-2 w-full">
                     <div
                       className={cn(
                         'w-2 h-2 rounded-full flex-shrink-0',
-                        notification.type === 'warning' && 'bg-warning',
-                        notification.type === 'info' && 'bg-primary',
-                        notification.type === 'success' && 'bg-success'
+                        announcement.type === 'holiday' && 'bg-destructive',
+                        announcement.type === 'news' && 'bg-warning',
+                        announcement.type === 'event' && 'bg-success',
+                        (!['holiday', 'news', 'event'].includes(announcement.type)) && 'bg-primary'
                       )}
                     />
-                    <span className="font-medium text-sm truncate flex-1">{notification.title}</span>
+                    <span className="font-medium text-sm truncate flex-1">{announcement.title}</span>
                   </div>
                   <p className="text-xs text-muted-foreground line-clamp-2 pl-4">
-                    {notification.message}
+                    {announcement.content}
                   </p>
                 </DropdownMenuItem>
               ))}

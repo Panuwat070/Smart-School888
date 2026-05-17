@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { BookOpen, Search, Download, Eye, Filter, BookMarked } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { mockBooks, subjects } from '@/lib/mock-data'
+import { subjects } from '@/lib/mock-data'
 import type { Book } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -40,18 +40,34 @@ export default function BooksPage() {
   const [selectedSubject, setSelectedSubject] = useState<string>('all')
   const [selectedBook, setSelectedBook] = useState<Book | null>(null)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  
+  const [books, setBooks] = useState<Book[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/books')
+      .then(res => res.json())
+      .then(data => {
+        setBooks(data)
+        setIsLoading(false)
+      })
+      .catch(err => {
+        console.error(err)
+        setIsLoading(false)
+      })
+  }, [])
 
   const filteredBooks = useMemo(() => {
-    return mockBooks.filter(book => {
+    return books.filter(book => {
       const matchesSearch = 
         book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         book.author.toLowerCase().includes(searchQuery.toLowerCase())
       const matchesSubject = selectedSubject === 'all' || book.subject === selectedSubject
       return matchesSearch && matchesSubject
     })
-  }, [searchQuery, selectedSubject])
+  }, [searchQuery, selectedSubject, books])
 
-  const uniqueSubjects = [...new Set(mockBooks.map(b => b.subject))]
+  const uniqueSubjects = [...new Set(books.map(b => b.subject))]
 
   return (
     <div className="space-y-6">
@@ -72,7 +88,7 @@ export default function BooksPage() {
               <BookOpen className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">{mockBooks.length}</p>
+              <p className="text-2xl font-bold text-foreground">{books.length}</p>
               <p className="text-sm text-muted-foreground">หนังสือทั้งหมด</p>
             </div>
           </CardContent>
@@ -130,14 +146,19 @@ export default function BooksPage() {
             {/* Book Cover */}
             <div
               className={cn(
-                'aspect-[3/4] relative bg-gradient-to-br flex items-center justify-center p-6',
-                coverColors[index % coverColors.length]
+                'aspect-[3/4] relative flex items-center justify-center p-6',
+                book.coverImage ? 'bg-secondary/50' : 'bg-gradient-to-br ' + coverColors[index % coverColors.length]
               )}
             >
-              <div className="text-white text-center">
-                <BookOpen className="w-16 h-16 mx-auto mb-3 opacity-80" />
-                <p className="font-bold text-lg leading-tight">{book.title}</p>
-              </div>
+              {book.coverImage ? (
+                <img src={book.coverImage} alt={book.title} className="absolute inset-0 w-full h-full object-cover opacity-90" />
+              ) : (
+                <div className="text-white text-center">
+                  <BookOpen className="w-16 h-16 mx-auto mb-3 opacity-80" />
+                  <p className="font-bold text-lg leading-tight">{book.title}</p>
+                </div>
+              )}
+
               {/* Hover overlay */}
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                 <Button size="sm" variant="secondary" className="gap-2">
@@ -188,14 +209,18 @@ export default function BooksPage() {
             <div className="space-y-4">
               <div
                 className={cn(
-                  'aspect-[3/4] max-h-64 mx-auto rounded-lg bg-gradient-to-br flex items-center justify-center p-6',
-                  coverColors[mockBooks.findIndex(b => b.id === selectedBook.id) % coverColors.length]
+                  'aspect-[3/4] max-h-64 mx-auto rounded-lg flex items-center justify-center p-6 relative overflow-hidden',
+                  selectedBook.coverImage ? 'bg-secondary/50' : 'bg-gradient-to-br ' + coverColors[books.findIndex(b => b.id === selectedBook.id) % coverColors.length]
                 )}
               >
-                <div className="text-white text-center">
-                  <BookOpen className="w-12 h-12 mx-auto mb-2 opacity-80" />
-                  <p className="font-bold leading-tight">{selectedBook.title}</p>
-                </div>
+                {selectedBook.coverImage ? (
+                  <img src={selectedBook.coverImage} alt={selectedBook.title} className="absolute inset-0 w-full h-full object-cover" />
+                ) : (
+                  <div className="text-white text-center">
+                    <BookOpen className="w-12 h-12 mx-auto mb-2 opacity-80" />
+                    <p className="font-bold leading-tight">{selectedBook.title}</p>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-3">

@@ -13,6 +13,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 import { buildings } from '@/lib/mock-data'
 import type { Room } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -212,9 +223,61 @@ export default function RoomsPage() {
               )}
 
               {room.status === 'available' && (
-                <Button className="w-full mt-2 bg-success hover:bg-success/90 text-success-foreground">
-                  จองห้อง
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="w-full mt-2 bg-success hover:bg-success/90 text-success-foreground">
+                      จองห้อง
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>จองห้อง {room.name}</DialogTitle>
+                      <DialogDescription>
+                        กรอกข้อมูลเพื่อทำการจองห้อง {room.name}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="subject" className="text-right">
+                          หัวข้อ/วิชา
+                        </Label>
+                        <Input
+                          id="subject"
+                          placeholder="เช่น ติวคณิตศาสตร์"
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="time" className="text-right">
+                          เวลาสิ้นสุด
+                        </Label>
+                        <Input
+                          id="time"
+                          type="time"
+                          className="col-span-3"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="people" className="text-right">
+                          จำนวนคน
+                        </Label>
+                        <Input
+                          id="people"
+                          type="number"
+                          placeholder="จำนวนคน"
+                          className="col-span-3"
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button type="button" onClick={() => alert(`จองห้อง ${room.name} สำเร็จแล้ว!`)}>
+                          ยืนยันการจอง
+                        </Button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               )}
             </CardContent>
           </Card>

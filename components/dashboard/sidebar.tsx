@@ -37,6 +37,7 @@ const adminMenuItems = [
   { icon: CalendarCog, label: 'จัดการตารางเรียน', href: '/dashboard/admin/schedules' },
   { icon: DoorClosed, label: 'จัดการห้องเรียน', href: '/dashboard/admin/rooms' },
   { icon: Bell, label: 'จัดการประกาศ', href: '/dashboard/admin/announcements' },
+  { icon: BookOpen, label: 'จัดการหนังสือเรียน', href: '/dashboard/admin/books' },
   { icon: User, label: 'โปรไฟล์', href: '/dashboard/profile' },
 ]
 

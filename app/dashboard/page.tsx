@@ -20,7 +20,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { mockNotifications, days } from '@/lib/mock-data'
+import { days } from '@/lib/mock-data'
 import { cn } from '@/lib/utils'
 import type { Schedule, Announcement, Room } from '@/lib/types'
 
@@ -419,32 +419,34 @@ export default function DashboardPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {mockNotifications.slice(0, 3).map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={cn(
-                          'p-3 rounded-lg',
-                          !notification.read ? 'bg-primary/5' : 'bg-secondary/50'
-                        )}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={cn(
-                              'w-2 h-2 rounded-full',
-                              notification.type === 'warning' && 'bg-warning',
-                              notification.type === 'info' && 'bg-primary',
-                              notification.type === 'success' && 'bg-success'
-                            )}
-                          />
-                          <span className="font-medium text-sm text-foreground">{notification.title}</span>
+                  {announcements.length === 0 ? (
+                    <div className="text-center text-sm text-muted-foreground py-4">ไม่มีการแจ้งเตือนใหม่</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {announcements.slice(0, 3).map((announcement) => (
+                        <div
+                          key={announcement.id}
+                          className="p-3 rounded-lg bg-secondary/50"
+                        >
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={cn(
+                                'w-2 h-2 rounded-full flex-shrink-0',
+                                announcement.type === 'holiday' && 'bg-destructive',
+                                announcement.type === 'news' && 'bg-warning',
+                                announcement.type === 'event' && 'bg-success',
+                                (!['holiday', 'news', 'event'].includes(announcement.type)) && 'bg-primary'
+                              )}
+                            />
+                            <span className="font-medium text-sm text-foreground truncate flex-1">{announcement.title}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1 pl-4 line-clamp-2">
+                            {announcement.content}
+                          </p>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1 pl-4">
-                          {notification.message}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

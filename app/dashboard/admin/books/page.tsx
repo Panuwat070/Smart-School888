@@ -113,7 +113,9 @@ export default function AdminBooksPage() {
   const handleDelete = async () => {
     if (bookToDelete) {
       try {
-        await fetch(`/api/books/${bookToDelete.id}`, { method: 'DELETE' })
+        const res = await fetch(`/api/books/${bookToDelete.id}`, { method: 'DELETE' })
+        if (!res.ok) throw new Error('Failed to delete book')
+        
         setBooks(prev => prev.filter(b => b.id !== bookToDelete.id))
         toast({
           title: 'ลบสำเร็จ',
